@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using GLGameJam.Game;
+using GLGameJam.Game.Player;
 using GLGameJam.Input;
 using GLGameJam.Player;
 using GLGameJam.UI;
@@ -23,6 +24,7 @@ namespace GLGameJam.Screens
         public const int MaxPlayerCards = 8;
 
         public PlayerResources PlayerResources { get; }
+        public PlayerBoard PlayerBoard { get; }
         public InputManager InputManager { get; }
         public Shop Shop { get; }
         public GameBoard GameBoard { get; }
@@ -35,6 +37,14 @@ namespace GLGameJam.Screens
             this.InputManager = new InputManager();
             this.Shop = new Shop(PlayerResources, InputManager);
             this.GameBoard = new GameBoard(InputManager);
+
+            var playerBoardPosition = new Point(GameBoard.GameBoardStartX + GameBoard.TileSize * GameScreen.MaxPlayerCards/4,
+                GameBoard.GameBoardStartY + GameBoard.GameBoardSizeY * GameBoard.TileSize +
+                GameBoard.TileSpacing * GameBoard.GameBoardSizeY + GameBoard.TileSize * 1);
+            this.PlayerBoard = new PlayerBoard(PlayerResources, playerBoardPosition);
+            PlayerResources.Gold = 999;
+            PlayerResources.Exp = 0;
+            PlayerResources.Level = 1;
         }
 
         public override void LoadContent(AssetManager assetManager)
@@ -53,17 +63,19 @@ namespace GLGameJam.Screens
             InputManager.Update(gameTime);
 
             GameBoard.Update(gameTime);
+            PlayerBoard.Update(gameTime);
 
-            PlayerResources.Update(gameTime);
+            Shop.Update(gameTime);
         }
 
         public override void Draw(CustomBatch customBatch)
         {
             this.GameBoard.Draw(customBatch);
+            this.PlayerBoard.Draw(customBatch);
             this.Shop.Draw(customBatch);
 
             customBatch.SetOrigin(8, 8);
-            this.PlayerResources.DrawSidebar(customBatch);
+
             customBatch.SetOrigin(0, 0);
             InputManager.DrawDebug(customBatch);
         }

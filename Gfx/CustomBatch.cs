@@ -83,7 +83,7 @@ namespace GLJamGame
             if (fontSize == FontSize.Small)
             {
                 sz = 4;
-                spacing = 1f;
+                spacing = 1.0f;
                 suffix = "_small";
             }
 

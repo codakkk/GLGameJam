@@ -17,45 +17,160 @@ using Microsoft.Xna.Framework.Input;
 namespace GLGameJam.UI
 {
 
-    public class Shop
+    public class Shop : BaseContainer
     {
 
         #region Constants
         private const int ShopX = 0;
-        private const int ShopY = 135;
-        private const int ShopWidth = 320;
+        private const int ShopY = CoreGame.GameSizeY - ShopHeight;
+        private const int ShopWidth = CoreGame.GameSizeX;
         private const int ShopHeight = 45;
         public const int MaxShopCards = 5;
         #endregion
 
         private readonly InputManager inputManager;
 
-        private readonly CardDefinition[] currentShopCards;
-
         private readonly PlayerResources playerResources;
 
-        public Shop(PlayerResources playerResources, InputManager inputManager)
+        #region UI Widgets
+        private readonly ShopCard[] currentShopCards;
+        private FloatingText errorText;
+        #endregion
+
+
+
+        public Shop(PlayerResources playerResources, InputManager inputManager) : base(new Point(ShopX, ShopY), new Point(ShopWidth, ShopHeight))
         {
             this.playerResources = playerResources;
             this.inputManager = inputManager;
-            currentShopCards = new CardDefinition[MaxShopCards];
+            currentShopCards = new ShopCard[MaxShopCards];
+
+            InitializeUI();
+
             RefreshShop();
+        }
+
+        private void InitializeUI()
+        {
+            // Create card shop
+            var cardX = Size.X / 2 - 2 * ShopCard.CardSizeX;
+            var cardY = (Size.Y / 2) - (ShopCard.CardSizeY / 2);
+            const int spacing = 2;
+
+            for (var i = 0; i < currentShopCards.Length; ++i)
+            {
+                var cardStartX = cardX + (ShopCard.CardSizeX + spacing) * i;
+                var shopCard = new ShopCard(new Point(cardStartX, cardY))
+                {
+                    CardDefinition = CardDefinitions.Mage
+                };
+
+                AddWidget(shopCard);
+
+                shopCard.OnPress += () =>
+                {
+                    if (shopCard.CardDefinition.Gold > playerResources.Gold || !playerResources.HasSpaceForCard())
+                        return;
+                    playerResources.GiveCard(new Card(shopCard.CardDefinition));
+
+                    playerResources.Gold -= shopCard.CardDefinition.Gold;
+
+                    shopCard.CardDefinition = null;
+                    shopCard.IsVisible = false;
+
+                    ShowFloating("New card!");
+                };
+
+                currentShopCards[i] = shopCard;
+            }
+
+            // Static Widgets
+            AddWidget(new TextWidget(new Point(Size.X - 100, -16), "R:Refresh [2 €]", FontSize.Small)
+            {
+                Color = Color.White
+            });
+            AddWidget(new TextWidget(new Point(Size.X - 100, -24), "F:Buy Exp [2 €]", FontSize.Small)
+            {
+                Color = Color.White
+            });
+
+            // Mutable widgets
+            errorText = new FloatingText(new Point(160 - 16, -8), "Test");
+            AddWidget(errorText);
+
+            var levelText = new TextWidget(new Point(0, -8), "Level", FontSize.Small)
+            {
+                Color = Colors.ExpColor
+            };
+
+            AddWidget(levelText);
+
+            var goldText = new TextWidget(new Point(3, 5), "€ 0", FontSize.Normal)
+            {
+                Color = Color.White
+            };
+
+            AddWidget(goldText);
+
+            var expText = new TextWidget(new Point(3, 5 + 16), $"£ {playerResources.Exp/playerResources.NextExp}", FontSize.Normal)
+            {
+                Color = Color.White
+            };
+
+            AddWidget(expText);
+
+
+            playerResources.OnGoldChange += () =>
+            {
+                goldText.Text = $"€ {playerResources.Gold}";
+
+                foreach (var shopCard in currentShopCards)
+                {
+                    if (shopCard.CardDefinition == null)
+                        continue;
+                    shopCard.CanAfford = !(shopCard.CardDefinition.Gold > playerResources.Gold);
+                }
+            };
+
+            playerResources.OnExpChange += () =>
+            {
+                expText.Text = $"£ {playerResources.Exp}/{playerResources.NextExp}";
+            };
+
+            playerResources.OnLevelUp += () =>
+            {
+                levelText.Text = playerResources.Level == PlayerResources.MaxLevel
+                    ? "Level Max."
+                    : $"Level {playerResources.Level}";
+
+                if (playerResources.Level != 1)
+                {
+                    ShowFloating("£ Level Up £");
+                }
+            };
         }
 
         public void RefreshShop()
         {
-            for (var i = 0; i < currentShopCards.Length; ++i)
+            foreach(var shopCard in currentShopCards)
             {
-                currentShopCards[i] = RandomUtils.RandomRange(CardDefinitions.CardDefinitionsList);
+                shopCard.CardDefinition = RandomUtils.RandomRange(CardDefinitions.CardDefinitionsList);
+                shopCard.IsVisible = true;
             }
         }
 
-        public void LoadContent(AssetManager assetManager)
+        public override void LoadContent(AssetManager assetManager)
         {
         }
 
-        public void Input(InputManager inputManager)
+        public override void Update(GameTime gameTime)
         {
+            base.Update(gameTime);
+        }
+
+        public override void Input(InputManager inputManager)
+        {
+            base.Input(inputManager);
             if (inputManager.IsActionJustDown("shop_refresh") && playerResources.Gold >= GameScreen.ShopRefreshPrice)
             {
                 RefreshShop();
@@ -68,102 +183,21 @@ namespace GLGameJam.UI
             }
         }
 
-        private void DrawCards(CustomBatch customBatch)
+        public override void Draw(CustomBatch customBatch)
         {
-            const int cardX = ShopWidth / 2 - 2 * ShopCard.CardSizeX;
-            const int cardY = (ShopHeight / 2) - (ShopCard.CardSizeY / 2);
-            const int spacing = 2;
+            base.Draw(customBatch);
 
-            var shopOrigin = customBatch.GetOrigin();
+            customBatch.SetOrigin(Position.X, Position.Y);
 
-            for (var i = 0; i < currentShopCards.Length; ++i)
-            {
-                var card = currentShopCards[i];
-
-                if (card == null)
-                    continue;
-
-                var cardStartX = shopOrigin.X + cardX + (ShopCard.CardSizeX + spacing) * i;
-                var cardStartY = shopOrigin.Y + cardY;
-
-                customBatch.SetOrigin(cardStartX, cardStartY);
-
-                bool hovering = false;
-
-                var (mx, my) = inputManager.MousePosition;
-
-                if (mx > cardStartX && mx < cardStartX + ShopCard.CardSizeX && my > cardStartY &&
-                    my < cardStartY + ShopCard.CardSizeY)
-                    hovering = true;
-
-                // var hovering = new Rectangle(cardStartX, cardStartY, cardStartX + ShopCard.CardSize, cardStartY + ShopCard.CardSize).Contains(inputManager.MousePosition);
-
-                if (hovering)
-                {
-                    const int offsetY = 2;
-                    const int offsetX = 2;
-                    customBatch.DrawNineRect(0, -offsetY, ShopCard.CardSizeX, ShopCard.CardSizeY, Color.White);
-                    customBatch.DrawPixelString(new Vector2(offsetX, 4 - offsetY), "ATK " + card.Attack, Color.White, FontSize.Small);
-                    customBatch.DrawPixelString(new Vector2(offsetX, 12 - offsetY), "DEF " + card.Armor, Color.White, FontSize.Small);
-                    customBatch.DrawPixelString(new Vector2(offsetX, 20 - offsetY), "HP " + card.Health, Color.White, FontSize.Small);
-
-                    if (Mouse.GetState().LeftButton == ButtonState.Pressed && playerResources.Gold >= card.Gold && playerResources.HasSpaceForCard())
-                    {
-                        playerResources.GiveCard(new Card(card));
-                        currentShopCards[i] = null;
-                        playerResources.Gold -= card.Gold;
-                    }
-                }
-                else
-                {
-                    customBatch.DrawNineRect(0, 0, ShopCard.CardSizeX, ShopCard.CardSizeY, Color.White);
-                    customBatch.Draw(card.SourceName, new Rectangle(ShopCard.CardSizeX / 2 - 8, 12, 16, 16), Color.White);
-                    var vec = new Point(ShopCard.CardSizeX - 12, -4);
-                    //customBatch.Draw("melee_icon", ShopCard.CardSizeX - 12, -4);
-                    var priceColor = Color.White;
-
-                    if (playerResources.Gold < card.Gold)
-                        priceColor = Color.DarkRed;
-
-                    customBatch.Draw("coin_icon", new Rectangle(4, 4, 6, 6), priceColor);
-                    customBatch.DrawPixelString(new Vector2(11, 4), card.Gold.ToString(), priceColor, FontSize.Small);
-                }
-
-                //card.Draw(customBatch, hovering);
-            }
-        }
-
-        public void Draw(CustomBatch customBatch)
-        {
-            customBatch.SetOrigin(ShopX, ShopY);
-
-            customBatch.DrawNineRect(0, 0, ShopWidth, ShopHeight, Color.White);
-
-            var levelStr = playerResources.Level == PlayerResources.MaxLevel
-                ? "Level Max."
-                : $"Level {playerResources.Level}";
-
-
-            customBatch.DrawPixelString(new Vector2(0, -24), "R: Refresh", playerResources.Gold < GameScreen.ShopRefreshPrice ? Colors.ErrorColor : Colors.ExpColor, FontSize.Small);
-            customBatch.DrawPixelString(new Vector2(0, -16), "F: Buy EXP", playerResources.Gold < GameScreen.ShopExpPrice ? Colors.ErrorColor : Colors.ExpColor, FontSize.Small);
-            customBatch.DrawPixelString(new Vector2(0, -8), levelStr, Colors.ExpColor, FontSize.Small);
-
-            const int goldX = 3;
-            const int goldY = 5;
-            customBatch.Draw("gold", goldX, goldY);
-            customBatch.DrawPixelString(new Vector2(goldX + 13, goldY), playerResources.Gold.ToString(), Color.White);
-
-            string expStr = playerResources.Level == PlayerResources.MaxLevel ? "Max." : $"{playerResources.Exp}/{playerResources.NextExp}";
-            customBatch.Draw("exp", goldX, goldY + 16);
-            customBatch.DrawPixelString(new Vector2(goldX + 13, goldY + 16), expStr, Color.White);
-
-
-            // Each method will use its origin
-
-            DrawCards(customBatch);
+            customBatch.DrawNineRect(0, 0, Size.X, Size.Y, Color.White);
 
             customBatch.SetOrigin(0, 0);
         }
 
+        private void ShowFloating(string text)
+        {
+            errorText.Text = text;
+            errorText.IsVisible = true;
+        }
     }
 }

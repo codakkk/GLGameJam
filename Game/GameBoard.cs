@@ -1,26 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using GLGameJam.Game;
 using GLGameJam.Gfx;
 using GLGameJam.Input;
 using GLJamGame;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 
-namespace GLGameJam
+namespace GLGameJam.Game
 {
     public class GameBoard
     {
-        public const int GameBoardStartX = CoreGame.GameSizeX / 2 - (GameBoardSizeX / 2) * 14 - 2;
-        public const int GameBoardStartY = 10;
+        public const int GameBoardStartX = CoreGame.GameSizeX / 2 - (GameBoardSizeX / 2) * 14 + 4;
+        public const int GameBoardStartY = 40;
         public const int GameBoardSizeX = 12;
         public const int GameBoardSizeY = 8;
         public const int TileSpacing = 1;
-        public const int TileSize = 14;
+        public const int TileSize = 16;
 
         private Card[] boardCards;
 
@@ -75,7 +68,7 @@ namespace GLGameJam
 
                     customBatch.Draw(type, new Rectangle(wx, wy - offsetY, TileSize, TileSize), color);
 
-                    card?.DrawInBoard(customBatch, wx - 1, wx - 6 - offsetY);
+                    card?.DrawInBoard(customBatch, wx, wx - 4 - offsetY);
 
                     yes = !yes;
                 }

@@ -39,7 +39,7 @@ namespace GLGameJam.Input
             get
             {
                 var (x, y) = Mouse.GetState().Position;
-                return new Point((int)(x* CoreGame.GameScaleX), (int) (y* CoreGame.GameScaleY));
+                return new Point((int)(x * CoreGame.GameScaleX), (int) (y * CoreGame.GameScaleY));
             }
         }
 
@@ -50,6 +50,7 @@ namespace GLGameJam.Input
 
             Register("shop_refresh", new KeyMap() { Key = Keys.R });
             Register("shop_buyexp", new KeyMap() { Key = Keys.F });
+            Register("click", new KeyMap() { MouseAction = MouseAction.Left });
         }
 
         public void Update(GameTime gameTime)

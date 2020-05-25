@@ -54,6 +54,8 @@ namespace GLGameJam
             CreateRegion("health_icon", 666, 174, 10, 10);
             CreateRegion("armor_icon", 546, 19, 12, 12);*/
 
+            CreateRegion("player_board_tile", 66, 2, 12, 12);
+
             NinePatch = new NinePatch(Get("menu_patch"), 4, 4, 4, 4);
             ButtonNinePatch = new NinePatch(Get("button_patch"), 4, 4, 4, 4);
 
@@ -62,7 +64,7 @@ namespace GLGameJam
                 '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ':', '.', '/',
                 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
                 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
-                '#', '+', '-', '*', '_', '=', '[', ']'
+                '#', '+', '-', '*', '_', '=', '[', ']', '€', '£'
             };
 
             // Load normal (16x16)

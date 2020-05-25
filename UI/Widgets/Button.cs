@@ -33,6 +33,11 @@ namespace GLGameJam.UI.Widgets
             ninePatch = new NinePatch(assetManager.Get("button_patch"), 4, 4, 4, 4);
         }
 
+        public override void Update(GameTime gameTime)
+        {
+            
+        }
+
         public override void Draw(CustomBatch customBatch)
         {
             ninePatch.Draw(customBatch, new Rectangle(Position, Size), Color);

@@ -9,6 +9,13 @@ using Microsoft.Xna.Framework;
 
 namespace GLGameJam.Game
 {
+    public enum CardRarity : uint
+    {
+        Common,
+        Rare,
+        VeryRare,
+    }
+
     public class Card
     {
         public CardDefinition CardDefinition { get; private set; }
@@ -65,10 +72,10 @@ namespace GLGameJam.Game
             customBatch.Draw(CardDefinition.SourceName, posX, posY, Color);
         }
 
-        public void DrawInList(CustomBatch customBatch)
+        public void DrawInList(CustomBatch customBatch, int posX, int posY)
         {
-            customBatch.DrawNineRect(0, 0, 24, 24, Color.White);
-            customBatch.Draw(CardDefinition.SourceName, 4, 4, Color);
+            //customBatch.DrawNineRect(0, 0, 24, 24, Color.White);
+            customBatch.Draw(CardDefinition.SourceName, posX, posY, Color);
         }
     }
 }

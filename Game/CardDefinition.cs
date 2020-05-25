@@ -11,8 +11,26 @@ namespace GLGameJam.Game
     {
         public static List<CardDefinition> CardDefinitionsList = new List<CardDefinition>();
 
-        public static CardDefinition Mage = new CardDefinition() { Name = "Mage", SourceName = "mage", Attack = 20, Armor = 2, Health = 3, Gold = 2};
-        public static CardDefinition Warrior = new CardDefinition() { Name = "Warrior", SourceName = "warrior", Attack = 2, Armor = 5, Health = 10, Gold = 10 };
+        public static CardDefinition Mage = new CardDefinition()
+        {
+            Name = "Mage", 
+            SourceName = "mage", 
+            Attack = 20, 
+            Armor = 2, 
+            Health = 3, 
+            Gold = 2,
+            Rarity = CardRarity.Common
+        };
+        public static CardDefinition Warrior = new CardDefinition()
+        {
+            Name = "Warrior", 
+            SourceName = "warrior", 
+            Attack = 2, 
+            Armor = 5, 
+            Health = 10, 
+            Gold = 10,
+            Rarity = CardRarity.Common
+        };
 
     }
 
@@ -27,6 +45,8 @@ namespace GLGameJam.Game
         public int Health { get; internal set; }
 
         public int Gold { get; internal set; }
+
+        public CardRarity Rarity { get; internal set; }
 
         public CardDefinition()
         {

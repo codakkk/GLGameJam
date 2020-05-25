@@ -16,7 +16,18 @@ namespace GLGameJam.Player
         public const int ExpPerLevel = 2;
         public const int MaxLevel = 8;
 
-        public int Gold { get; set; }
+        private int gold;
+        public int Gold
+        {
+            get => gold;
+            set
+            {
+                if (value < 0)
+                    value = 0;
+                gold = value;
+                OnGoldChange?.Invoke();
+            }
+        }
 
         private int exp;
         public int Exp
@@ -25,9 +36,13 @@ namespace GLGameJam.Player
             set
             {
                 exp = value;
+                OnExpChange?.Invoke();
+
                 if (exp < NextExp) 
                     return;
-                exp -= NextExp;
+                Exp -= NextExp;
+                
+
                 Level++;
             }
         }
@@ -44,6 +59,7 @@ namespace GLGameJam.Player
                     level = 1;
                 else if (level > MaxLevel)
                     level = MaxLevel;
+                OnLevelUp?.Invoke();
             }
         }
 
@@ -51,17 +67,17 @@ namespace GLGameJam.Player
 
         public Card[] PlayerCards { get; }
 
+        public Action OnLevelUp;
+        public Action OnExpChange;
+        public Action OnGoldChange;
+
         public PlayerResources()
         {
-            Gold = 30;
-            Exp = 0;
-            Level = 1;
             this.PlayerCards = new Card[GameScreen.MaxPlayerCards];
-            this.PlayerCards[0] = new Card(CardDefinitions.Mage);
+            Level = 1;
         }
 
-
-        public void Update(GameTime gameTime)
+        private void CheckCardLevels()
         {
             for (int i = 0; i < GameScreen.MaxPlayerCards; ++i)
             {
@@ -98,7 +114,7 @@ namespace GLGameJam.Player
             }
         }
 
-        public void DrawSidebar(CustomBatch customBatch)
+        /*public void DrawSidebar(CustomBatch customBatch)
         {
             const int CardX = 2;
             const int CardY = 4;
@@ -117,7 +133,7 @@ namespace GLGameJam.Player
                 }
             }
             customBatch.SetOrigin(0, 0);
-        }
+        }*/
 
         public bool GiveCard(Card card)
         {
@@ -130,6 +146,8 @@ namespace GLGameJam.Player
                 PlayerCards[i] = card;
                 break;
             }
+            
+            CheckCardLevels();
             return true;
         }
 

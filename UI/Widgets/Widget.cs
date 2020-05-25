@@ -10,15 +10,61 @@ namespace GLGameJam.UI.Widgets
 {
     public abstract class Widget
     {
-        public Point Position { get; set; }
-        public Point Size { get; set; }
+        private bool isVisible;
+        public bool IsVisible
+        {
+            get => isVisible;
+            set
+            {
+                if (!value)
+                    IsHovered = false;
+                isVisible = value;
+            }
+        }
 
-        public Color Color { get; set; }
+        private Point position;
+        public Point Position
+        {
+            get
+            {
+                var result = position;
+                if (Parent != null)
+                {
+                    result += Parent.Position;
+                }
+
+                return result;
+            }
+            set => position = value;
+        }
+        public Point Size { get; set; }
+        public Color Color { get; set; } = Color.White;
+
+        public bool IsHovered { get; set; }
+
+        private Widget parent;
+        public Widget Parent
+        {
+            get => parent;
+            set
+            {
+                if (value == this)
+                    return;
+                parent = value;
+            }
+        }
+
+        public Rectangle Bounds => new Rectangle(Position, Size);
+
+        public Action OnPress { get; set; }
+        public Action OnHoverEnter { get; set; }
+        public Action OnHoverExit { get; set; }
 
         protected Widget(Point position, Point size)
         {
             this.Position = position;
             this.Size = size;
+            this.IsVisible = true;
         }
 
         public virtual void LoadContent(AssetManager assetManager)
@@ -28,11 +74,8 @@ namespace GLGameJam.UI.Widgets
 
         public virtual void Update(GameTime gameTime)
         {
-
         }
 
-        public virtual void Draw(CustomBatch customBatch)
-        {
-        }
+        public abstract void Draw(CustomBatch customBatch);
     }
 }

@@ -1,4 +1,5 @@
-﻿using GLGameJam;
+﻿using System;
+using GLGameJam;
 using GLGameJam.Gfx;
 using GLGameJam.Screens;
 using GLJamGame.Screens;
@@ -12,18 +13,19 @@ namespace GLJamGame
     {
 
         #region Constants
-        public const int GameSizeX = 320;
-        public const int GameSizeY = 180;
 
-        public const int WindowSizeX = 1280;
-        public const int WindowSizeY = 720;
+        public const int GameSizeX = 480;//384;
+        public const int GameSizeY = 270;//216;
+
+        public static int WindowSizeX = 1280;
+        public static int WindowSizeY = 720;
 
         #endregion
 
         public static int FramesPerSecond = 0;
 
-        public static float GameScaleX = (float)GameSizeX / WindowSizeX;
-        public static float GameScaleY = (float)GameSizeY / WindowSizeY;
+        public static float GameScaleX => (float)GameSizeX / WindowSizeX;
+        public static float GameScaleY => (float)GameSizeY / WindowSizeY;
 
 
 
@@ -41,11 +43,19 @@ namespace GLJamGame
             GraphicsDeviceManager = new GraphicsDeviceManager(this)
             {
                 PreferredBackBufferWidth = WindowSizeX,
-                PreferredBackBufferHeight = WindowSizeY
+                PreferredBackBufferHeight = WindowSizeY,
             };
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
+            Window.AllowUserResizing = true;
+            Window.ClientSizeChanged += OnWindowSizeChanged;
             Mouse.WindowHandle = Window.Handle;
+        }
+
+        private void OnWindowSizeChanged(object sender, EventArgs e)
+        {
+            WindowSizeX = Window.ClientBounds.Width;
+            WindowSizeY = Window.ClientBounds.Height;
         }
 
         protected override void Initialize()
@@ -60,7 +70,7 @@ namespace GLJamGame
 
             CustomBatch = new CustomBatch(GraphicsDevice, AssetManager);
 
-            this.renderTarget = new RenderTarget2D(GraphicsDevice, 320, 180);
+            this.renderTarget = new RenderTarget2D(GraphicsDevice, GameSizeX, GameSizeY);
 
 
             ScreenManager = new ScreenManager(AssetManager);
