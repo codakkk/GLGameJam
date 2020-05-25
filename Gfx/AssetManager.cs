@@ -8,6 +8,7 @@ using GLJamGame;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 
 namespace GLGameJam
 {
@@ -17,6 +18,7 @@ namespace GLGameJam
 
         public Texture2D MainTexture { get; private set; }
         public NinePatch NinePatch { get; private set; }
+        public NinePatch ButtonNinePatch { get; private set; }
 
         private readonly Dictionary<string, Rectangle> rects;
 
@@ -31,31 +33,61 @@ namespace GLGameJam
 
         public void LoadContent()
         {
-            MainTexture = contentManager.Load<Texture2D>("colored_transparent");
-            CreateRegion("menu_patch", 663, 238, 16, 16);
-            CreateRegion("gold", 697, 68, 16, 16);
-            CreateRegion("exp", 561, 170, 16, 16);
-            CreateRegion("mage", 408, 0, 16, 16);
+            MainTexture = contentManager.Load<Texture2D>("spritesheet");
+            CreateRegion("pointer", 647, 171, 7, 12);
+            CreateRegion("menu_patch", 0, 0, 16, 16);
+            CreateRegion("button_patch", 16, 0, 16, 16);
+            CreateRegion("gold", 0, 16, 16, 16);
+            CreateRegion("exp", 16, 16, 16, 16);
+            CreateRegion("mage", 0, 64, 16, 16);
+            CreateRegion("warrior", 16, 64, 16, 16);
+            CreateRegion("tile_empty", 33, 1, 14, 14);
+            CreateRegion("tile_fill", 49, 1, 14, 14);
+
+            // icons
+            CreateRegion("coin_icon", 37, 21, 6, 6);
+            CreateRegion("mage_icon", 48, 16, 16, 16);
+            CreateRegion("ranged_icon", 64, 16, 16, 16);
+            CreateRegion("melee_icon", 80, 16, 16, 16);
+            CreateRegion("armor_icon", 112, 16, 16, 16);
+            /*CreateRegion("attack_icon", 547, 105, 10, 10);
+            CreateRegion("health_icon", 666, 174, 10, 10);
+            CreateRegion("armor_icon", 546, 19, 12, 12);*/
+
             NinePatch = new NinePatch(Get("menu_patch"), 4, 4, 4, 4);
+            ButtonNinePatch = new NinePatch(Get("button_patch"), 4, 4, 4, 4);
 
             var chars = new []
             {
-                '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ':', '.', '%',
+                '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ':', '.', '/',
                 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
                 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
-                '#', '+', '-', '*', '/', '=', '@',
+                '#', '+', '-', '*', '_', '=', '[', ']'
             };
 
-            // Load all characters
-            const int startX = 595;
-            const int startY = 289;
-            const int sz = 16;
+            // Load normal (16x16)
+            int startX = 0;
+            int startY = 416;
+            int sz = 16;
 
             for (var i = 0; i < chars.Length; ++i)
             {
                 var dfX = i % 13;
                 var dfY = i / 13;
-                CreateRegion(chars[i].ToString(), startX + dfX * sz + dfX, startY + dfY * sz + dfY, sz, sz);
+                CreateRegion(chars[i].ToString(), startX + dfX * sz, startY + dfY * sz , sz, sz);
+
+            }
+
+            // Load small font (8x8)
+            startX = 0;
+            startY = 480;
+            sz = 8;
+
+            for (var i = 0; i < chars.Length; ++i)
+            {
+                var dfX = i % 13;
+                var dfY = i / 13;
+                CreateRegion(chars[i] + "_small", startX + dfX * sz, startY + dfY * sz, sz, sz);
             }
         }
 

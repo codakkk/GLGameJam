@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using GLJamGame;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
@@ -33,6 +34,16 @@ namespace GLGameJam.Input
         private KeyboardState lastKeyboardState;
         private MouseState lastMouseState;
 
+        public Point MousePosition
+        {
+            get
+            {
+                var (x, y) = Mouse.GetState().Position;
+                return new Point((int)(x* CoreGame.GameScaleX), (int) (y* CoreGame.GameScaleY));
+            }
+        }
+
+
         public InputManager()
         {
             keyMap = new Dictionary<string, KeyMap>();
@@ -45,6 +56,11 @@ namespace GLGameJam.Input
         {
             lastKeyboardState = Keyboard.GetState();
             lastMouseState = Mouse.GetState();
+        }
+
+        public void DrawDebug(CustomBatch customBatch)
+        {
+            //customBatch.DrawPixelString(new Vector2(0, 0), $"{MousePosition.X}:{MousePosition.Y}", Color.White);
         }
 
         public bool IsActionDown(string actionName)

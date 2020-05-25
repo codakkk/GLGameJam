@@ -33,7 +33,7 @@ namespace GLGameJam.UI
             destPatches = new Rectangle[9];
         }
 
-        public void Draw(CustomBatch customBatch, Rectangle rectangle)
+        public void Draw(CustomBatch customBatch, Rectangle rectangle, Color color)
         {
             if (lastRectangle != rectangle)
             {
@@ -42,7 +42,7 @@ namespace GLGameJam.UI
             }
             for(var i = 0; i < sourcePatches.Length; ++i)
             {
-                customBatch.Draw(sourcePatches[i], destPatches[i]);
+                customBatch.Draw(sourcePatches[i], destPatches[i], color);
             }
         }
 

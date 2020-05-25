@@ -43,9 +43,13 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Game\GameBoard.cs" />
+    <Compile Include="Game\Card.cs" />
+    <Compile Include="Game\CardDefinition.cs" />
     <Compile Include="Gfx\AssetManager.cs" />
+    <Compile Include="Gfx\Colors.cs" />
     <Compile Include="Gfx\CustomBatch.cs" />
-    <Compile Include="Game1.cs" />
+    <Compile Include="CoreGame.cs" />
     <Compile Include="Input\InputManager.cs" />
     <Compile Include="Input\KeyboardExtensions.cs" />
     <Compile Include="Player\PlayerResources.cs" />
@@ -55,8 +59,11 @@
     <Compile Include="Screens\GameScreen.cs" />
     <Compile Include="Screens\ScreenManager.cs" />
     <Compile Include="UI\Shop.cs" />
+    <Compile Include="UI\ShopCard.cs" />
     <Compile Include="UI\Widgets\Button.cs" />
     <Compile Include="UI\Widgets\NinePatch.cs" />
+    <Compile Include="UI\Widgets\Widget.cs" />
+    <Compile Include="Utils\RandomUtils.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="MonoGame.Framework">
