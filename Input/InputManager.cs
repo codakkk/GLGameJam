@@ -42,7 +42,7 @@ namespace GLGameJam.Input
                 return new Point((int)(x * CoreGame.GameScaleX), (int) (y * CoreGame.GameScaleY));
             }
         }
-
+        public Point LastMousePosition { get; private set; }
 
         public InputManager()
         {
@@ -57,6 +57,7 @@ namespace GLGameJam.Input
         {
             lastKeyboardState = Keyboard.GetState();
             lastMouseState = Mouse.GetState();
+            LastMousePosition = MousePosition;
         }
 
         public void DrawDebug(CustomBatch customBatch)

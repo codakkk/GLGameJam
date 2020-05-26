@@ -52,7 +52,7 @@ namespace GLGameJam.UI
             }
             //customBatch.Draw("melee_icon", ShopCard.CardSizeX - 12, -4);
 
-            //if (playerResources.Gold < CardDefinition.Gold)
+            //if (player.Gold < CardDefinition.Gold)
                 //priceColor = Color.DarkRed;
 
         }

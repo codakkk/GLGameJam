@@ -41,6 +41,7 @@ namespace GLGameJam
             CreateRegion("exp", 16, 16, 16, 16);
             CreateRegion("mage", 0, 64, 16, 16);
             CreateRegion("warrior", 16, 64, 16, 16);
+            CreateRegion("chicken", 32, 64, 16, 16);
             CreateRegion("tile_empty", 33, 1, 14, 14);
             CreateRegion("tile_fill", 49, 1, 14, 14);
 

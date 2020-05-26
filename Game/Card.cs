@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using GLGameJam.Gfx;
+using GLGameJam.UI.Widgets;
 using GLJamGame;
 using Microsoft.Xna.Framework;
 
@@ -61,21 +62,11 @@ namespace GLGameJam.Game
             }
         }
 
+
         public Card(CardDefinition cardDefinition)
         {
             this.Level = 1;
             this.CardDefinition = cardDefinition;
-        }
-
-        public void DrawInBoard(CustomBatch customBatch, int posX, int posY)
-        {
-            customBatch.Draw(CardDefinition.SourceName, posX, posY, Color);
-        }
-
-        public void DrawInList(CustomBatch customBatch, int posX, int posY)
-        {
-            //customBatch.DrawNineRect(0, 0, 24, 24, Color.White);
-            customBatch.Draw(CardDefinition.SourceName, posX, posY, Color);
         }
     }
 }

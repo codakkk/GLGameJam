@@ -33,6 +33,8 @@ namespace GLGameJam.UI
                         widget.IsHovered = true;
                         widget.OnHoverEnter?.Invoke();
                     }
+                    else if (inputManager.LastMousePosition != inputManager.MousePosition)
+                        widget.OnHoverMoved?.Invoke();
                     if (inputManager.IsActionJustDown("click"))
                         widget.OnPress?.Invoke();
                 }

@@ -8,10 +8,12 @@ using GLGameJam.Screens;
 using GLJamGame;
 using Microsoft.Xna.Framework;
 
-namespace GLGameJam.Player
+namespace GLGameJam
 {
-    public class PlayerResources
+    public class Player
     {
+        public const int MaxBenchCards = 8;
+
         public const int StartExpLevel = 4;
         public const int ExpPerLevel = 2;
         public const int MaxLevel = 8;
@@ -65,107 +67,91 @@ namespace GLGameJam.Player
 
         public int NextExp => StartExpLevel + ExpPerLevel * (Level-1);
 
-        public Card[] PlayerCards { get; }
+        public HashSet<Card> TotalCards { get; private set; }
+
+        private readonly Card[] bench;
+        
 
         public Action OnLevelUp;
         public Action OnExpChange;
         public Action OnGoldChange;
 
-        public PlayerResources()
+        public Action<int, Card> OnAddCard;
+        public Action<Card> OnRemoveCard;
+
+        public Player()
         {
-            this.PlayerCards = new Card[GameScreen.MaxPlayerCards];
+            this.bench = new Card[MaxBenchCards];
+            this.TotalCards = new HashSet<Card>();
             Level = 1;
         }
 
         private void CheckCardLevels()
         {
-            for (int i = 0; i < GameScreen.MaxPlayerCards; ++i)
+            var toRemove = new List<Card>();
+            foreach(var card in TotalCards.Where(card => card.Level < 3))
             {
-                var card = PlayerCards[i];
-
-                if (card == null || card.Level == 3)
+                if (toRemove.Contains(card))
                     continue;
 
                 var count = 0;
 
-                var temp = new Card[3];
-                temp[count++] = card;
+                var temp = new Card[2];
 
-                for (var k = 0; k < GameScreen.MaxPlayerCards; ++k)
+                foreach (var other in TotalCards)
                 {
-                    var other = PlayerCards[k];
-                    if (other == card || other == null)
-                        continue;
-
-                    if (card.CardDefinition != other.CardDefinition || card.Level != other.Level) 
+                    if (other == card || toRemove.Contains(other) || card.CardDefinition != other.CardDefinition || card.Level != other.Level)
                         continue;
 
                     temp[count++] = other;
 
-                    if (count != 3) 
+                    if (count != 2) 
                         continue;
-                    RemoveCards(temp);
+
+                    toRemove.AddRange(temp);
 
                     card.Level++;
-                    GiveCard(card);
-
                     break;
                 }
             }
-        }
 
-        /*public void DrawSidebar(CustomBatch customBatch)
-        {
-            const int CardX = 2;
-            const int CardY = 4;
-            for (int x = 0; x < CardX; ++x)
-            for (int y = 0; y < CardY; ++y)
-            {
-                var card = PlayerCards[x + y * CardX];
-                customBatch.SetOrigin(CardX + x * 24 + x, CardY + y * 24 + y);
-                if (card == null)
-                {
-                    customBatch.DrawNineRect(0, 0, 24, 24, Color.White);
-                }
-                else
-                {
-                    card.DrawInList(customBatch);
-                }
-            }
-            customBatch.SetOrigin(0, 0);
-        }*/
+            RemoveCards(toRemove.ToArray());
+        }
 
         public bool GiveCard(Card card)
         {
-            if (card == null || !HasSpaceForCard())
+            if (card == null || IsBenchFull())
                 return false;
-            for (int i = 0; i < GameScreen.MaxPlayerCards; ++i)
+            
+            for (var i = 0; i < MaxBenchCards; ++i)
             {
-                if (PlayerCards[i] != null)
+                if (bench[i] != null)
                     continue;
-                PlayerCards[i] = card;
+                bench[i] = card;
+                OnAddCard?.Invoke(i, card);
                 break;
             }
-            
+
+            TotalCards.Add(card);
+
             CheckCardLevels();
             return true;
         }
 
         public bool RemoveCard(Card card)
         {
-            if (card == null)
+            if (card == null || !TotalCards.Remove(card))
                 return false;
-            bool res = false;
-            for (int i = 0; i < GameScreen.MaxPlayerCards; ++i)
+
+            var benchIndex = Array.FindIndex(bench, c => c == card);
+
+            if (benchIndex != -1)
             {
-                if (PlayerCards[i] != card)
-                    continue;
-                PlayerCards[i] = null;
-                res = true;
-                break;
+                bench[benchIndex] = null;
             }
 
-            return res;
+            OnRemoveCard?.Invoke(card);
+            return true;
         }
 
         public void RemoveCards(params Card[] cards)
@@ -176,16 +162,15 @@ namespace GLGameJam.Player
             }
         }
 
-        public bool HasSpaceForCard()
+        public bool IsBenchFull()
         {
-            int count = 0;
-            for (int i = 0; i < GameScreen.MaxPlayerCards; ++i)
+            var count = 0;
+            for (var i = 0; i < MaxBenchCards; ++i)
             {
-                if (PlayerCards[i] != null)
+                if (bench[i] != null)
                     count++;
             }
-
-            return count != GameScreen.MaxPlayerCards;
+            return count == MaxBenchCards;
         }
     }
 }

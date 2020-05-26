@@ -48,6 +48,7 @@ namespace GLJamGame
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
             Window.AllowUserResizing = true;
+            Window.Position = new Point(0, 0);
             Window.ClientSizeChanged += OnWindowSizeChanged;
             Mouse.WindowHandle = Window.Handle;
         }

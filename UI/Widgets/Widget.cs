@@ -28,7 +28,7 @@ namespace GLGameJam.UI.Widgets
             get
             {
                 var result = position;
-                if (Parent != null)
+                if (Parent != null && ParentAsOrigin)
                 {
                     result += Parent.Position;
                 }
@@ -56,8 +56,11 @@ namespace GLGameJam.UI.Widgets
 
         public Rectangle Bounds => new Rectangle(Position, Size);
 
+        public bool ParentAsOrigin { get; set; } = true;
+
         public Action OnPress { get; set; }
         public Action OnHoverEnter { get; set; }
+        public Action OnHoverMoved { get; set; }
         public Action OnHoverExit { get; set; }
 
         protected Widget(Point position, Point size)

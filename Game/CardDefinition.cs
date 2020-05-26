@@ -23,11 +23,22 @@ namespace GLGameJam.Game
         };
         public static CardDefinition Warrior = new CardDefinition()
         {
-            Name = "Warrior", 
-            SourceName = "warrior", 
-            Attack = 2, 
-            Armor = 5, 
-            Health = 10, 
+            Name = "Warrior",
+            SourceName = "warrior",
+            Attack = 2,
+            Armor = 5,
+            Health = 10,
+            Gold = 10,
+            Rarity = CardRarity.Common
+        };
+
+        public static CardDefinition ZioDeeNo = new CardDefinition()
+        {
+            Name = "Zio DeeNo",
+            SourceName = "chicken",
+            Attack = 2,
+            Armor = 5,
+            Health = 10,
             Gold = 10,
             Rarity = CardRarity.Common
         };

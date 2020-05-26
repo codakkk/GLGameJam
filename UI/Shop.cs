@@ -1,18 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using GLGameJam.Game;
+﻿using GLGameJam.Game;
 using GLGameJam.Gfx;
 using GLGameJam.Input;
-using GLGameJam.Player;
 using GLGameJam.Screens;
 using GLGameJam.UI.Widgets;
 using GLGameJam.Utils;
 using GLJamGame;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
 
 namespace GLGameJam.UI
 {
@@ -30,7 +23,7 @@ namespace GLGameJam.UI
 
         private readonly InputManager inputManager;
 
-        private readonly PlayerResources playerResources;
+        private readonly Player player;
 
         #region UI Widgets
         private readonly ShopCard[] currentShopCards;
@@ -39,9 +32,9 @@ namespace GLGameJam.UI
 
 
 
-        public Shop(PlayerResources playerResources, InputManager inputManager) : base(new Point(ShopX, ShopY), new Point(ShopWidth, ShopHeight))
+        public Shop(Player player, InputManager inputManager) : base(new Point(ShopX, ShopY), new Point(ShopWidth, ShopHeight))
         {
-            this.playerResources = playerResources;
+            this.player = player;
             this.inputManager = inputManager;
             currentShopCards = new ShopCard[MaxShopCards];
 
@@ -69,11 +62,11 @@ namespace GLGameJam.UI
 
                 shopCard.OnPress += () =>
                 {
-                    if (shopCard.CardDefinition.Gold > playerResources.Gold || !playerResources.HasSpaceForCard())
+                    if (shopCard.CardDefinition.Gold > player.Gold || player.IsBenchFull())
                         return;
-                    playerResources.GiveCard(new Card(shopCard.CardDefinition));
+                    player.GiveCard(new Card(shopCard.CardDefinition));
 
-                    playerResources.Gold -= shopCard.CardDefinition.Gold;
+                    player.Gold -= shopCard.CardDefinition.Gold;
 
                     shopCard.CardDefinition = null;
                     shopCard.IsVisible = false;
@@ -112,7 +105,7 @@ namespace GLGameJam.UI
 
             AddWidget(goldText);
 
-            var expText = new TextWidget(new Point(3, 5 + 16), $"£ {playerResources.Exp/playerResources.NextExp}", FontSize.Normal)
+            var expText = new TextWidget(new Point(3, 5 + 16), $"£ {player.Exp/player.NextExp}", FontSize.Normal)
             {
                 Color = Color.White
             };
@@ -120,30 +113,30 @@ namespace GLGameJam.UI
             AddWidget(expText);
 
 
-            playerResources.OnGoldChange += () =>
+            player.OnGoldChange += () =>
             {
-                goldText.Text = $"€ {playerResources.Gold}";
+                goldText.Text = $"€ {player.Gold}";
 
                 foreach (var shopCard in currentShopCards)
                 {
                     if (shopCard.CardDefinition == null)
                         continue;
-                    shopCard.CanAfford = !(shopCard.CardDefinition.Gold > playerResources.Gold);
+                    shopCard.CanAfford = !(shopCard.CardDefinition.Gold > player.Gold);
                 }
             };
 
-            playerResources.OnExpChange += () =>
+            player.OnExpChange += () =>
             {
-                expText.Text = $"£ {playerResources.Exp}/{playerResources.NextExp}";
+                expText.Text = $"£ {player.Exp}/{player.NextExp}";
             };
 
-            playerResources.OnLevelUp += () =>
+            player.OnLevelUp += () =>
             {
-                levelText.Text = playerResources.Level == PlayerResources.MaxLevel
+                levelText.Text = player.Level == Player.MaxLevel
                     ? "Level Max."
-                    : $"Level {playerResources.Level}";
+                    : $"Level {player.Level}";
 
-                if (playerResources.Level != 1)
+                if (player.Level != 1)
                 {
                     ShowFloating("£ Level Up £");
                 }
@@ -171,15 +164,15 @@ namespace GLGameJam.UI
         public override void Input(InputManager inputManager)
         {
             base.Input(inputManager);
-            if (inputManager.IsActionJustDown("shop_refresh") && playerResources.Gold >= GameScreen.ShopRefreshPrice)
+            if (inputManager.IsActionJustDown("shop_refresh") && player.Gold >= GameScreen.ShopRefreshPrice)
             {
                 RefreshShop();
-                playerResources.Gold -= GameScreen.ShopRefreshPrice;
+                player.Gold -= GameScreen.ShopRefreshPrice;
             }
-            else if (inputManager.IsActionJustDown("shop_buyexp") && playerResources.Gold >= GameScreen.ShopExpPrice)
+            else if (inputManager.IsActionJustDown("shop_buyexp") && player.Gold >= GameScreen.ShopExpPrice)
             {
-                playerResources.Exp += 2;
-                playerResources.Gold -= GameScreen.ShopExpPrice;
+                player.Exp += 2;
+                player.Gold -= GameScreen.ShopExpPrice;
             }
         }
 
